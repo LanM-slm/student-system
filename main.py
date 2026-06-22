@@ -1,4 +1,4 @@
-from classes import OpenCourse
+from classes import OpenCourse, WriteCourse
 from classes import Main, Course
 
 def first_check():
@@ -15,20 +15,25 @@ def first_check():
             exit()
 def main():
     main = Main()
-    courses = OpenCourse()
+    courses = OpenCourse().open()
+    write_course = WriteCourse()
     while True:
         user = first_check()
         try:
             if user == 1:
                 print('1)Add course')
                 print('2)Display courses')
-                print('3)Delete course')
+                print('3)Search course')
+                print('4)Delete course')
                 choose = int(input('Enter a variant: '))
                 if choose == 1:
                     main.add_course(courses)
+                    write_course.write(courses)
                 elif choose == 2:
-                    pass
+                    main.display_course(courses)
                 elif choose == 3:
+                    pass
+                elif choose == 4:
                     pass
                 else:
                     print('Invalid input!')

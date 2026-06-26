@@ -22,6 +22,26 @@ class OpenCourse:
             print('\nBye bye!')
             exit()
 
+class OpenStudent:
+    @staticmethod
+    def open():
+        try:
+            if not os.path.exists('students.json'):
+                print('File of students is not defined!')
+                answer = input('Give your permission to create this file(y/n): ').lower().strip()
+                if answer == 'y':
+                    with open('students.json', 'w', encoding='utf-8') as f:
+                        return []
+                else:
+                    exit()
+            else:
+                with open('students.json', 'r', encoding='utf-8') as f:
+                    reader =json.load(f)
+                return reader
+        except KeyboardInterrupt:
+            print('Bye bye!')
+            exit()
+
 class WriteCourse:
     @staticmethod
     def write(ml):
@@ -31,6 +51,26 @@ class WriteCourse:
         except FileNotFoundError:
             print('File of courses does not exist!')
             exit()
+
+class WriteStudent:
+    @staticmethod
+    def write(student):
+        try:
+            with open('students.json', 'w', encoding='utf-8') as f:
+                json.dump(student, f, indent=4, ensure_ascii=False)
+        except FileNotFoundError:
+            print('File of students does not exist!')
+            exit()
+
+class FindIdx:
+    def idx_st(self, students, obj):
+        for idx, stud in enumerate(students):
+            if stud['Name'] == obj.name and stud['Course'] == obj.course:
+                return idx
+    def idx_cr(self, courses, obj):
+        for idx, course in enumerate(courses):
+            if course['Name'] == obj.name:
+                return idx
 
 class Course:
     def __init__(self, name, students=None, total=0):
@@ -55,12 +95,55 @@ class Course:
     def add_course(self, course, courses):
         courses.append(course.to_dict(course))
         print('Course is added!')
+    def avg_score(self, students, course):
+        ml = []
+        for stud in students:
+            if stud['Course'] == course:
+                ml.append(value for value in stud['Grades'].values())
+        avg = sum(ml) // len(ml)
+        print(f'Average score: {avg}')
     def to_dict(self, course):
         return {'Name': course.name,
                 'Students': course.students,
                 'Students total': course.total}
     def __str__(self):
         return f'Name: {self.__name}\nStudents: {self.__students}\nStudents total: {self.__total}'
+
+class Student:
+    def __init__(self, name, course, grades=None):
+        self.__name = name
+        self.__course = course
+        self.__grades = grades
+    @property
+    def name(self):
+        return self.__name
+    @property
+    def course(self):
+        return self.__course
+    @property
+    def grades(self):
+        return self.__grades
+    @grades.setter
+    def grades(self, grade):
+        for el in grade:
+            if el > 100 or el < 0:
+                print('Invalid input!')
+            else:
+                self.__grades = grade
+    @staticmethod
+    def find_student(name, course, students):
+        for stud in students:
+            if stud['Name'] == name and stud['Course'] == course:
+                obj = Student(stud['Name'], stud['Course'], stud['Grades'])
+                return True, obj
+        return False, None
+    def add_student(self, students, obj, write_stud):
+        students.append(obj.to_dict(obj))
+        write_stud.write(students)
+    def to_dict(self, student):
+        return {'Name': student.name,
+                'Course': student.course,
+                'Grades': student.grades}
 
 class Main:
     def add_course(self, courses):
@@ -70,13 +153,13 @@ class Main:
             flag = new_course.check_course_name(new_course, courses)
             if flag:
                 print('That course is exist!')
-                return
+                return 
             else:
                 new_course.add_course(new_course, courses)
         except KeyboardInterrupt:
             print('\nBye bye!')
             exit()
-    def display_course(self, courses):
+    def search_course(self, courses):
         try:
             course_name = input('Enter course name: ').rstrip().lstrip().title()
             obj = Course(course_name)
@@ -90,3 +173,109 @@ class Main:
         except KeyboardInterrupt:
             print('Bye bye!')
             exit()
+    def delete_course(self, courses):
+        try:
+            course_name = input('Enter course name: ').title().rstrip().lstrip()
+            course = Course(course_name)
+            for c in courses:
+                if c['Name'] == course.name:
+                    courses.remove(c)
+                    print('Course successfully deleted!')
+                    return
+            else:
+                print('Course is not exist!')
+        except KeyboardInterrupt:
+            print('Bye bye!')
+            exit()
+    def avg_score(self, students):
+        course = input('Enter course: ').title().strip()
+        c = Course(course)
+        flag = c.check_course_name(c)
+        if flag:
+            c.avg_score(students, course)
+        else:
+            print('Course is not exist!')
+    def add_student(self, students, courses, write_stud, write_course):
+        name = input('Enter name: ').title().rstrip().lstrip()
+        course = input('Enter course: ').title().strip()
+        obj2 = Course(course)
+        flag, obj = Student.find_student(name, course, students)
+        flag2 = obj2.check_course_name(obj2, courses)
+        if flag2:
+            if flag:
+                print('Student exists!')
+                return False
+        elif not flag2:
+            print('Course does not exist!')
+            return False
+        else:
+            obj = Student(name, course)
+            obj.add_student(students, obj, write_stud)
+    def delete_student(self, students, write_stud):
+        name = input('Enter student name: ').title().rstrip().lstrip()
+        course = input('Enter course: ').title().strip()
+        flag, obj = Student.find_student(name, course, students)
+        if flag:
+            students.remove(obj.to_dict(obj))
+            write_stud.write(students)
+            return True
+        else:
+            print('Student does not exist!')
+            return False
+    def add_grade(self, students, write_stud, idx):
+        name = input('Enter student name: ').title().rstrip().lstrip()
+        course = input('Enter course: ').title().strip()
+        flag, obj = Student.find_student(name, course, students)
+        if flag:
+            idx_st = idx.idx_st(students, obj)
+            while True:
+                try:
+                    if obj.grades == None:
+                        grade = int(input('Enter a grade: '))
+                        obj.grades = [grade]
+                        students[idx_st] = obj.to_dict(obj)
+                        write_stud.write(students)
+                        return True
+                    else:
+                        if len(obj.grades) == 2:
+                            print('Grades are full!')
+                            return False
+                        grade = int(input('Enter a grade: '))
+                        obj.grades.append(grade)
+                        students[idx_st] = obj.to_dict(obj)
+                        write_stud.write(students)
+                        return True
+                except ValueError:
+                    print('Invalid input!')
+                    continue
+        else:
+            print('Student does not exist!')
+            return False
+    def delete_grade(self, students, write_stud, idx):
+        name = input('Enter student name: ').title().rstrip().lstrip()
+        course = input('Enter course: ').title().strip()
+        flag, obj = Student.find_student(name, course, students)
+        if flag:
+            idx_st = idx.idx_st(students, obj)
+            while True:
+                try:
+                    grade = int(input('Enter the grade: '))
+                    if obj.grades == None:
+                        print('The student does not have any grades!')
+                        return False
+                    elif grade in obj.grades:
+                        obj.grades.remove(grade)
+                        students[idx_st] = obj.to_dict(obj)
+                        write_stud.write(students)
+                        return True
+                    else:
+                        print('The student does not have such a grade!')
+                        return False
+                except ValueError:
+                    print('Invalid input!')
+                    continue
+        else:
+            print('The student does not exist!')
+            return False
+                
+                

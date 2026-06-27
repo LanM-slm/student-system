@@ -62,7 +62,7 @@ def main():
                         if flag:
                             print('Successfully deleted!')
                     elif second_choice == 'a':
-                        flag = main.add_student(students, courses, write_stud, write_course)
+                        flag = main.add_student(students, courses, write_stud, write_course, idx)
                         if flag == False:
                             continue
                         else:
@@ -95,5 +95,5 @@ def main():
         
 main()
 
-#total\studnts of course
+#total\students of course
 #Check a course since adding student

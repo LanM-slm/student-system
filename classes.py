@@ -83,15 +83,22 @@ class Course:
     @property
     def students(self):
         return self.__students
+    @students.setter
+    def students(self, st):
+        self.__students = st
     @property
     def total(self):
         return self.__total
+    @total.setter
+    def total(self, n):
+        self.__total = n
     @staticmethod
     def check_course_name(course, courses):
         for c in courses:
-            if c['Name'] == course.name:
-                return True
-        return False
+            if c['Name'] == course:
+                obj = Course(c['Name'], c['Students'], c['Students total'])
+                return True, obj
+        return False, None
     def add_course(self, course, courses):
         courses.append(course.to_dict(course))
         print('Course is added!')
@@ -149,12 +156,12 @@ class Main:
     def add_course(self, courses):
         try:
             course_name = input('Enter course name: ').title().lstrip().rstrip()
-            new_course = Course(course_name)
-            flag = new_course.check_course_name(new_course, courses)
+            flag, obj = Course.check_course_name(course_name, courses)
             if flag:
                 print('That course is exist!')
                 return 
             else:
+                new_course = Course(course_name)
                 new_course.add_course(new_course, courses)
         except KeyboardInterrupt:
             print('\nBye bye!')
@@ -162,8 +169,7 @@ class Main:
     def search_course(self, courses):
         try:
             course_name = input('Enter course name: ').rstrip().lstrip().title()
-            obj = Course(course_name)
-            flag = obj.check_course_name(obj, courses)
+            flag, obj = Course.check_course_name(course_name, courses)
             if flag:
                 print(20 * '=')
                 print(obj)
@@ -176,41 +182,47 @@ class Main:
     def delete_course(self, courses):
         try:
             course_name = input('Enter course name: ').title().rstrip().lstrip()
-            course = Course(course_name)
-            for c in courses:
-                if c['Name'] == course.name:
-                    courses.remove(c)
+            flag, obj = Course.check_course_name(course_name, courses)
+            if flag:
+                    courses.remove(obj.to_dict(obj))
                     print('Course successfully deleted!')
                     return
             else:
-                print('Course is not exist!')
+                print('Course does not exist!')
         except KeyboardInterrupt:
             print('Bye bye!')
             exit()
     def avg_score(self, students):
         course = input('Enter course: ').title().strip()
-        c = Course(course)
-        flag = c.check_course_name(c)
+        flag, obj = Course.check_course_name(course)
         if flag:
-            c.avg_score(students, course)
+            obj.avg_score(students, course)
         else:
-            print('Course is not exist!')
-    def add_student(self, students, courses, write_stud, write_course):
+            print('Course does not exist!')
+    def add_student(self, students, courses, write_stud, write_course, idx):
         name = input('Enter name: ').title().rstrip().lstrip()
         course = input('Enter course: ').title().strip()
-        obj2 = Course(course)
         flag, obj = Student.find_student(name, course, students)
-        flag2 = obj2.check_course_name(obj2, courses)
-        if flag2:
-            if flag:
-                print('Student exists!')
-                return False
-        elif not flag2:
+        flag2, obj2 = Course.check_course_name(course, courses)
+        if not flag2:
             print('Course does not exist!')
             return False
+        if flag:
+            print('Student exists!')
+            return False
+        obj = Student(name, course)
+        obj2.total = 1 + obj2.total
+        if obj2.students == None:
+            obj2.students = [obj.name]
+            idx_cr = idx.idx_cr(courses, obj2)
+            courses[idx_cr] = obj2.to_dict(obj2)
+            write_course.write(courses)
         else:
-            obj = Student(name, course)
-            obj.add_student(students, obj, write_stud)
+            obj2.students.append(obj.name)
+            idx_cr = idx.idx_cr(courses, obj2)
+            courses[idx_cr] = obj2.to_dict(obj2)
+            write_course.write(courses)
+        obj.add_student(students, obj, write_stud)
     def delete_student(self, students, write_stud):
         name = input('Enter student name: ').title().rstrip().lstrip()
         course = input('Enter course: ').title().strip()

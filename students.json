@@ -2,14 +2,6 @@
     {
         "Name": "Lana",
         "Course": "Economy",
-        "Grades": [
-            100,
-            99
-        ]
-    },
-    {
-        "Name": "Vika",
-        "Course": "Engineering",
         "Grades": null
     }
 ]

@@ -1,7 +1,9 @@
 [
     {
         "Name": "Economy",
-        "Students": null,
-        "Students total": 0
+        "Students": [
+            "Lana"
+        ],
+        "Students total": 1
     }
 ]

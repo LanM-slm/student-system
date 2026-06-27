@@ -2,8 +2,14 @@
     {
         "Name": "Economy",
         "Students": [
+            "Lia",
             "Lana"
         ],
-        "Students total": 1
+        "Students total": 2
+    },
+    {
+        "Name": "Engineering",
+        "Students": [],
+        "Students total": 0
     }
 ]

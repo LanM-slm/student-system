@@ -3,5 +3,10 @@
         "Name": "Lana",
         "Course": "Economy",
         "Grades": null
+    },
+    {
+        "Name": "Lia",
+        "Course": "Economy",
+        "Grades": null
     }
 ]

@@ -43,7 +43,7 @@ def main():
                     main.delete_course(courses)
                     write_course.write(courses)  
                 elif choose == 5:
-                    main.avg_score(courses)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                    main.avg_score(students, courses)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                 else:
                     print('Invalid input!')
                     continue
@@ -58,7 +58,7 @@ def main():
                 if choice == 1:
                     second_choice = input('You want to delete or add the student(d/a)? ').lower().strip()
                     if second_choice == 'd':
-                        flag = main.delete_student(students, write_stud)
+                        flag = main.delete_student(students, courses, write_stud, write_course)
                         if flag:
                             print('Successfully deleted!')
                     elif second_choice == 'a':
@@ -83,6 +83,19 @@ def main():
                     else:
                         print('Invalid input!')
                         continue
+                elif choice == 3:
+                    flag = main.change_course(students, courses, write_stud, write_course, idx)
+                    if flag:
+                        print('Successfully changed!')
+                elif choice == 4:
+                    flag = main.change_grade(students, write_stud, idx)
+                    if flag:
+                        print('Successfully changed!')
+                elif choice == 5:
+                    main.display_students(students, courses)
+                else:
+                    print('Invalid input!')
+                    continue
             else:
                 print('Invalid input!')
                 continue
@@ -94,6 +107,3 @@ def main():
             exit()
         
 main()
-
-#total\students of course
-#Check a course since adding student

@@ -93,6 +93,8 @@ def main():
                         print('Successfully changed!')
                 elif choice == 5:
                     main.display_students(students, courses)
+                elif choice == 6:
+                    main.search_student(students)
                 else:
                     print('Invalid input!')
                     continue

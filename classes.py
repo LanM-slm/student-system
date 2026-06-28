@@ -371,7 +371,17 @@ class Main:
             ml = []
             for stud in students:
                 if stud['Course'] == obj.name:
-                    ml.append(stud)
-            print(*ml)
+                    print(stud)
+                    print(100 * '=')
         else:
             print('That course does not exist!')
+    def search_student(self, students):
+        name = input('Enter student name: ').title().rstrip().lstrip()
+        course = input('Enter course: ').strip().title()
+        flag, obj = Student.find_student(name, course, students)
+        if flag:
+            print(100 * '=')
+            print(obj.to_dict(obj))
+            print(100 * '=')
+        else:
+            print('Student does not exist!')
